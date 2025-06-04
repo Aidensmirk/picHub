@@ -1,0 +1,54 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Photo Gallery{% endblock %}</title>
+    <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 text-gray-800 flex flex-col min-h-screen">
+
+    <!-- Navbar -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="{% url 'home' %}" class="text-2xl font-bold text-indigo-600">📷 SnapShare</a>
+            <ul class="flex gap-6 text-md font-medium">
+                <li><a href="{% url 'gallery' %}" class="hover:text-indigo-500">Gallery</a></li>
+                <li><a href="#" class="hover:text-indigo-500">Upload</a></li>
+                <li><a href="#" class="hover:text-indigo-500">Profile</a></li>
+                {% if user.is_authenticated %}
+                    <form method="post" action="{% url 'logout' %}" class="inline" id="logout-form">
+                        {% csrf_token %}
+                    </form>
+                    <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" 
+                       class="font-medium text-indigo-600 hover:text-indigo-500 transition duration-150">
+                        Logout
+                    </a>
+                {% else %}
+                    <li><a href="{% url 'login' %}" class="hover:text-indigo-500">Login</a></li>
+                    <li><a href="{% url 'signup' %}" class="hover:text-indigo-500">Sign Up</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-8">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-200 py-8 mt-12">
+        <div class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p class="text-sm">&copy; {{ year }} SnapShare. All rights reserved.</p>
+            <div class="flex gap-6 text-sm">
+                <a href="#" class="hover:text-indigo-400 transition">Privacy Policy</a>
+                <a href="#" class="hover:text-indigo-400 transition">Terms of Service</a>
+                <a href="https://github.com/aidensmirk" class="hover:text-indigo-400 transition">GitHub</a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

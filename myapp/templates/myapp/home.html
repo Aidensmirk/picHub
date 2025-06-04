@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Home - SnapShare{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="text-center py-20 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white rounded-xl shadow-lg">
+    <div class="max-w-3xl mx-auto px-4">
+        <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Welcome to SnapShare</h1>
+        <p class="text-lg md:text-xl mb-6">Discover and share your favorite moments in a beautiful, creative gallery.</p>
+        <a href="{% url 'gallery' %}" class="bg-white text-indigo-600 font-semibold px-6 py-3 rounded-full shadow-lg hover:bg-gray-100 transition duration-300">
+            Browse Gallery
+        </a>
+    </div>
+</section>
+
+<!-- Preview Gallery -->
+<section class="mt-16">
+    <h2 class="text-2xl font-bold mb-6 text-center">Featured Photos</h2>
+    <div class="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 px-4">
+        {% for photo in featured_photos %}
+        <div class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition duration-300">
+            <img src="{{ photo.image.url }}" alt="{{ photo.title }}" class="w-full h-56 object-cover">
+            <div class="p-4">
+                <h3 class="text-lg font-semibold">{{ photo.title }}</h3>
+                <p class="text-sm text-gray-500 mt-1">By {{ photo.user.username }}</p>
+            </div>
+        </div>
+        {% empty %}
+        <p class="col-span-full text-center text-gray-500">No featured photos available right now.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for photo in photos %}
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+        <img src="{{ photo.image.url }}" alt="{{ photo.title }}" class="w-full h-64 object-cover">
+        <div class="p-4">
+            <h3 class="text-xl font-semibold mb-2">{{ photo.title }}</h3>
+            <p class="text-gray-600 mb-4">{{ photo.description }}</p>
+            <div class="flex items-center justify-between">
+                <span class="text-sm text-gray-500">By {{ photo.user.username }}</span>
+                <button onclick="likePhoto('{{ photo.id }}')" 
+                        class="like-btn flex items-center space-x-1 text-sm {% if request.user in photo.likes.all %}text-red-500{% endif %}">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"/>
+                    </svg>
+                    <span class="likes-count">{{ photo.total_likes }}</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <a href="{% url 'upload_photo' %}" class="btn btn-primary">Upload Photo</a>
+        </div>
+    </div>
+    
+    <div class="row">
+        {% for photo in photos %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <img src="{{ photo.image.url }}" class="card-img-top" alt="{{ photo.title }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ photo.title }}</h5>
+                    <p class="card-text">{{ photo.description }}</p>
+                    <p class="card-text">
+                        <small class="text-muted">Posted by {{ photo.user.username }} on {{ photo.created_at|date }}</small>
+                    </p>
+                    <form action="{% url 'like_photo' photo.id %}" method="POST" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm {% if request.user in photo.likes.all %}btn-danger{% else %}btn-outline-danger{% endif %}">
+                            ❤ {{ photo.total_likes }}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+function likePhoto(photoId) {
+    fetch(`/like/${photoId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        const btn = document.querySelector(`[onclick="likePhoto(${photoId})"]`);
+        btn.querySelector('.likes-count').textContent = data.likes;
+        btn.classList.toggle('text-red-500', data.liked);
+    });
+}
+</script>
+{% endblock %}
