@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,7 +27,7 @@ SECRET_KEY = 'django-insecure-eo7&o9g%5tjm^aa)8a738=3e&71r@8mh=5-j2kj0c8#y=8!by2
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -75,15 +76,18 @@ WSGI_APPLICATION = 'project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'second',
+#         'USER': 'photo',
+#         'PASSWORD': '123456',
+#         'HOST': 'localhost',  
+#         'PORT': '5432',     
+#     }
+# }
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'second',
-        'USER': 'photo',
-        'PASSWORD': '123456',
-        'HOST': 'localhost',  
-        'PORT': '5432',     
-    }
+    "default": dj_database_url.parse("postgresql://smirk_user:k9THNCds5d4rQkqEpQOJ0CaokP3fPGir@dpg-d0reodidbo4c73a9mid0-a.oregon-postgres.render.com/smirk")
 }
 
 
@@ -125,6 +129,7 @@ STATIC_URL = 'static/'
 
 STATICFILES_DIRS = [
     BASE_DIR / 'myapp' / 'static',
+    BASE_DIR / 'static'
 ]
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
